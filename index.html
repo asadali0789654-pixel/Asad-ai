@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ur">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#10182f">
+<title>Asad AI - Voice Demo</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0b1020;color:#eef2ff;font-family:system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;justify-content:center}
+.app{width:100%;max-width:620px;min-height:100vh;display:flex;flex-direction:column;background:linear-gradient(160deg,#111b38,#0b1020 55%)}
+header{padding:20px 17px 15px;border-bottom:1px solid #293451;display:flex;align-items:center;gap:12px}
+.logo{width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,#477bff,#7c4dff);display:grid;place-items:center;font-size:24px;font-weight:800}
+h1{font-size:21px;margin:0}header p{margin:3px 0 0;color:#aab7d4;font-size:12px}
+main{padding:16px;flex:1;display:flex;flex-direction:column;gap:12px}
+.welcome,.notice{padding:15px;border:1px solid #293451;border-radius:16px;background:#151f3a}
+.welcome h2{font-size:17px;margin:0 0 7px}.welcome p{margin:0;color:#b9c5df;font-size:13px;line-height:1.8}
+.notice{font-size:12px;color:#f5d38b;background:#392e19;border-color:#6b5428;line-height:1.7}
+#messages{display:flex;flex-direction:column;gap:10px}
+.msg{max-width:90%;padding:11px 13px;border-radius:15px;line-height:1.7;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.bot{align-self:flex-start;background:#1b2948;border:1px solid #304266}.user{align-self:flex-end;background:#354d9a}
+.controls{display:flex;gap:8px;flex-wrap:wrap;padding:0 16px 12px}
+button{border:0;border-radius:13px;padding:12px 14px;background:#5576ff;color:white;font-weight:700;font-size:14px}
+button.secondary{background:#263657;border:1px solid #405477}button:disabled{opacity:.5}
+form{padding:12px 14px 18px;display:flex;gap:8px;border-top:1px solid #293451}
+input{min-width:0;flex:1;border:1px solid #344260;background:#151f36;color:white;border-radius:14px;padding:13px;font-size:15px;outline:none}
+#status{text-align:center;color:#aab7d4;font-size:12px;min-height:18px;padding-bottom:8px}
+footer{text-align:center;color:#8290ad;font-size:11px;padding:0 12px 10px}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="logo">A</div><div><h1>Asad AI</h1><p>Your Personal AI Assistant • Voice Demo</p></div></header>
+<main>
+ <section class="welcome"><h2>السلام علیکم! میں Asad AI ہوں</h2><p>اب تم براؤزر کی دستیاب آواز کی سہولت آزما سکتے ہو۔ مائیکروفون دباؤ، بول کر پیغام دو، یا نیچے لکھ کر بھیجو۔</p></section>
+ <section class="notice">یہ ابھی آواز اور چیٹ کے انٹرفیس کا نمونہ ہے، مکمل AI نہیں۔ جوابات پہلے سے مقرر ہیں۔ مائیکروفون چلانے کے لیے Chrome کی اجازت اور انٹرنیٹ درکار ہو سکتا ہے۔</section>
+ <div id="messages"><div class="msg bot">وعلیکم السلام! میں تمہارا پیغام سننے یا پڑھنے کے لیے تیار ہوں۔</div></div>
+</main>
+<div class="controls">
+ <button id="mic" type="button">🎙️ بول کر لکھیں</button>
+ <button id="speakLast" class="secondary" type="button">🔊 آخری جواب سنیں</button>
+ <button id="stop" class="secondary" type="button">آواز بند کریں</button>
+</div>
+<div id="status" aria-live="polite">آواز کی سہولت آزمانے کے لیے مائیکروفون دبائیں۔</div>
+<form id="chat"><input id="prompt" placeholder="اردو یا English میں پیغام لکھیں..." autocomplete="off" aria-label="پیغام"><button type="submit">بھیجیں</button></form>
+<footer>Asad AI • Voice interface demo</footer>
+</div>
+<script>
+const form=document.getElementById('chat'), input=document.getElementById('prompt'), messages=document.getElementById('messages'), statusEl=document.getElementById('status');
+let lastReply='وعلیکم السلام! یہ Asad AI کا آواز والا نمونہ ہے۔ اصل AI جواب دینے کی سہولت بعد میں جوڑی جائے گی۔';
+function addMessage(text,who){const el=document.createElement('div');el.className='msg '+who;el.textContent=text;messages.appendChild(el);el.scrollIntoView({behavior:'smooth',block:'end'});}
+function replyTo(text){
+ addMessage(text,'user');
+ lastReply='تمہارا پیغام موصول ہوگیا! یہ ابھی صرف آواز اور چیٹ کا نمونہ ہے، اصل AI جواب دینے کی سہولت اگلے مرحلے میں شامل کی جائے گی۔';
+ addMessage(lastReply,'bot');
+}
+form.addEventListener('submit',e=>{e.preventDefault();const v=input.value.trim();if(!v)return;replyTo(v);input.value='';});
+function speak(text){
+ if(!('speechSynthesis' in window)){statusEl.textContent='اس براؤزر میں آواز سنانے کی سہولت دستیاب نہیں۔';return;}
+ speechSynthesis.cancel();const utter=new SpeechSynthesisUtterance(text);
+ utter.lang=/[\u0600-\u06FF]/.test(text)?'ur-PK':'en-US';
+ utter.onstart=()=>statusEl.textContent='Asad AI جواب سنا رہا ہے…';
+ utter.onend=()=>statusEl.textContent='آواز مکمل ہوگئی۔';
+ speechSynthesis.speak(utter);
+}
+document.getElementById('speakLast').addEventListener('click',()=>speak(lastReply));
+document.getElementById('stop').addEventListener('click',()=>{if('speechSynthesis'in window)speechSynthesis.cancel();statusEl.textContent='آواز بند کردی گئی۔';});
+const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+const mic=document.getElementById('mic');
+if(!SpeechRecognition){mic.disabled=true;mic.textContent='مائیک دستیاب نہیں';statusEl.textContent='اس Chrome/فون میں بول کر لکھنے کی سہولت دستیاب نہیں؛ ٹائپ کرکے آزمائیں۔';}
+else{
+ const rec=new SpeechRecognition();rec.lang='ur-PK';rec.interimResults=false;rec.maxAlternatives=1;
+ mic.addEventListener('click',()=>{try{statusEl.textContent='اب بولیں…';rec.start();}catch(e){statusEl.textContent='مائیک دوبارہ دبانے سے پہلے چند لمحے انتظار کریں۔';}});
+ rec.onresult=e=>{const said=e.results[0][0].transcript;input.value=said;statusEl.textContent='آپ کی بات لکھی گئی؛ بھیجنے کے لیے بٹن دبائیں۔';};
+ rec.onerror=e=>{statusEl.textContent='مائیک کی اجازت یا نیٹ ورک چیک کریں۔ ('+e.error+')';};
+ rec.onend=()=>{if(statusEl.textContent==='اب بولیں…')statusEl.textContent='سننا بند ہوگیا۔';};
+}
+</script>
+</body></html>
